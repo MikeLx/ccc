@@ -1,6 +1,10 @@
 
 %{
 #  include <stdio.h>
+#  include "abstract_syntax_tree.h"
+#  define NULLPTR ((void*) 0)
+abstract_syntax_tree* root;
+
 %}
 
 /* declare tokens */
@@ -12,57 +16,90 @@
 %token RETURN
 %token SEMICOLON
 %token PLUS
-%token INTEGER_CONSTANT
-%token IDENTIFIER
+%token <i_val> INTEGER_CONSTANT
+%token <s_val> IDENTIFIER
+%token FUNCTION
+%token ARGS_LIST
+%token STATEMENTS
 
+%union {
+  struct abstract_syntax_tree * p_ast;
+  int                           i_val;
+  char*                         s_val;
+}
+
+%type <p_ast>
+  function
+  paren_enclosed_args_list
+  args_list
+  type
+  pointer
+  formal_parameter
+  function_body
+  statements
+  statement
+  expression
 %%
 
-function: INT IDENTIFIER OPEN_PAREN args_list CLOSE_PAREN function_body { printf("function ..."); }
+function: INT IDENTIFIER paren_enclosed_args_list function_body {
+    $$   = ast_alloc(FUNCTION);
+    ast_append_child($$, ast_alloc(INT));
+    abstract_syntax_tree * ident = ast_alloc(IDENTIFIER);
+    ident->s_val = $2;
+    ast_append_child($$, ident);
+    ast_append_child($$, $3);
+    ast_append_child($$, $4);
+    root = $$;
+  }
  ;
 
+paren_enclosed_args_list: OPEN_PAREN args_list CLOSE_PAREN { $$ = $2; }
 
-args_list: /* nothing */
- | formal_parameter { printf("formal_parameter"); }
- | args_list COMMA formal_parameter { printf("args_list, formal_parameter"); }
+args_list: /* nothing */ { $$ = ast_alloc(ARGS_LIST); }
+ | formal_parameter { $$ = ast_alloc(ARGS_LIST); ast_append_child($$,$1); }
+ | args_list COMMA formal_parameter { $$ = $1; ast_append_child($$,$3); }
  ;
 
-type: INT { printf("INT"); }
- | CHAR { printf("CHAR"); }
+type: INT { $$ = ast_alloc(INT); }
+ | CHAR { $$ = ast_alloc(CHAR); }
  ;
 
-pointer: type ASTERISK { printf("type ASTERISK"); }
- | pointer ASTERISK { printf("pointer ASTERISK"); }
+pointer: type ASTERISK { $$ = ast_alloc(ASTERISK); ast_append_child($$, $1); }
+ | pointer ASTERISK { $$ = ast_alloc(ASTERISK); ast_append_child($$, $1); }
  ;
 
-formal_parameter: type IDENTIFIER { printf("type ID"); }
- | pointer IDENTIFIER { printf("pointer ID"); }
+formal_parameter: type IDENTIFIER { $$ = ast_alloc(IDENTIFIER); $$->s_val = $2; ast_append_child($$,$1); }
+ | pointer IDENTIFIER { $$ = ast_alloc(IDENTIFIER); $$->s_val = $2; ast_append_child($$,$1); }
  ;
 
-function_body: OPEN_BRACE CLOSE_BRACE { printf("EMPTY FUNCTION BODY"); }
- | OPEN_BRACE statements CLOSE_BRACE { printf("FUNCTION BODY WITH STATEMENTS!"); }
+function_body: OPEN_BRACE statements CLOSE_BRACE { $$ = $2; }
  ;
 
-statements: /* nothing */
- | statement statements { printf("recursive statements"); }
+statements: /* nothing */ { $$ = ast_alloc(STATEMENTS); }
+ | statement statements { $$ = $2; ast_append_child($$, $1); }
  ;
 
-statement: RETURN expression SEMICOLON { printf("RETURN expression;"); }
- | expression SEMICOLON { printf("expression;"); }
+statement: RETURN expression SEMICOLON { $$ = ast_alloc(RETURN); ast_append_child($$,$2); }
+ | expression SEMICOLON { $$ = $1; }
  ;
 
-expression: IDENTIFIER { printf("IDENTIFIER"); }
- | INTEGER_CONSTANT { printf("INTEGER_CONSTANT"); }
- | expression PLUS expression { printf("expr + expr"); }
+expression: IDENTIFIER { $$ = ast_alloc(IDENTIFIER); $$->s_val = $1; }
+ | INTEGER_CONSTANT { $$ = ast_alloc(INTEGER_CONSTANT); $$->i_val = $1; }
+ | expression PLUS expression {
+    $$ = ast_alloc(PLUS);
+    ast_append_child($$,$1);
+    ast_append_child($$,$3);
+  }
  ;
  
 %%
 int main(int argc, char** argv)
 {
-  printf("> "); 
   yyparse();
+  ast_print(root);
 }
 
-yyerror(char *s)
+int yyerror(char *s)
 {
   fprintf(stderr, "error: %s\n", s);
 }
