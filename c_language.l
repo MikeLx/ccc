@@ -2,6 +2,7 @@
 
 %{
 # include "c_language.tab.h"
+# include "stdio.h"
 %}
 
 %%
@@ -17,8 +18,8 @@
 "return" { return RETURN; }
 ";" { return SEMICOLON; }
 "+" { return PLUS; }
-[0-9]+  { return INTEGER_CONSTANT; }
-[a-zA-Z_]+[a-zA-Z0-9_]* { return IDENTIFIER; }
+[0-9]+  { yylval.i_val = atoi(yytext); return INTEGER_CONSTANT; }
+[a-zA-Z_]+[a-zA-Z0-9_]* { yylval.s_val = strdup(yytext); return IDENTIFIER; }
 
 "//".*\n?
 [ \t\n\r]   { /* ignore white space */ }
