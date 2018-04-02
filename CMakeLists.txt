@@ -23,4 +23,8 @@ set_source_files_properties(
 
 add_executable(ccc "abstract_syntax_tree.c" "c_language.tab.c" "lex.yy.c")
 
-target_link_libraries(ccc  "fl")
+find_library(FLEX_LIBRARY fl PATHS "/usr/local/opt/flex/lib")
+
+message("STATUS" "Flex library found at: " ${FLEX_LIBRARY})
+
+target_link_libraries(ccc ${FLEX_LIBRARY})
