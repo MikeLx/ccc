@@ -2,3 +2,8 @@ a.out
 *.tab.h
 *.tab.c
 *.yy.c
+ccc
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
