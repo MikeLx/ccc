@@ -77,6 +77,21 @@ void ast_append_child(abstract_syntax_tree* ast, abstract_syntax_tree* child)
   }
 }
 
+abstract_syntax_tree* ast_nth_child(abstract_syntax_tree* ast, size_t n)
+{
+  ast_nodelist* list = ast->children;
+  if (list)
+  {
+    size_t i = 0;
+    while(i < n && list)
+    {
+      list = list->next;
+      ++i;
+    }
+  }
+  return list;
+}
+
 void ast_free(abstract_syntax_tree* ast)
 {
   if (ast->children)

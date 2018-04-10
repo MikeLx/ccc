@@ -21,6 +21,6 @@ set_source_files_properties(
   PROPERTIES GENERATED TRUE
 )
 
-add_executable(ccc "abstract_syntax_tree.c" "c_language.tab.c" "lex.yy.c")
+add_executable(ccc "abstract_syntax_tree.c" "symbol_table.c" "c_language.tab.c" "lex.yy.c")
 
 target_link_libraries(ccc  "fl")

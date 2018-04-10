@@ -2,7 +2,7 @@
 %{
 #  include <stdio.h>
 #  include "abstract_syntax_tree.h"
-#  define NULLPTR ((void*) 0)
+#  include "symbol_table.h"
 abstract_syntax_tree* root;
 
 %}
@@ -97,6 +97,12 @@ int main(int argc, char** argv)
 {
   yyparse();
   ast_print(root);
+  symbol_table* st = st_alloc();
+  //root is always a function
+  abstract_syntax_tree* ident = ast_nth_child(root, 2);
+  st->append_symbol(st, ident->s_val);
+  st_enter_scope(st);
+
 }
 
 int yyerror(char *s)
