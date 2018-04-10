@@ -13,6 +13,7 @@ struct abstract_syntax_tree
   int           token_type;
   char*         s_val;
   int           i_val;
+  double        d_val;
   ast_nodelist* children;
 };
 

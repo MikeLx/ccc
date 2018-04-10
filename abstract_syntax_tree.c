@@ -30,6 +30,8 @@ const char* token_to_string(int token_type)
     return "SEMICOLON";
   case PLUS:
     return "PLUS";
+  case DOUBLE_CONSTANT:
+    return "DOUBLE_CONSTANT";
   case INTEGER_CONSTANT:
     return "INTEGER_CONSTANT";
   case IDENTIFIER:
@@ -102,6 +104,10 @@ char* _extra_stuff(abstract_syntax_tree* ast)
   case INTEGER_CONSTANT:
     ret = malloc(32);
     sprintf(ret, "(%d)", ast->i_val);
+    break;
+  case DOUBLE_CONSTANT:
+    ret = malloc(32);
+    sprintf(ret, "(%lf)", ast->d_val);
     break;
   case IDENTIFIER:
     ret = (char*) malloc(strlen(ast->s_val) + 3);

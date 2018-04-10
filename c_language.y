@@ -16,6 +16,7 @@ abstract_syntax_tree* root;
 %token RETURN
 %token SEMICOLON
 %token PLUS
+%token <d_val> DOUBLE_CONSTANT
 %token <i_val> INTEGER_CONSTANT
 %token <s_val> IDENTIFIER
 %token FUNCTION
@@ -23,9 +24,10 @@ abstract_syntax_tree* root;
 %token STATEMENTS
 
 %union {
-  struct abstract_syntax_tree * p_ast;
+  struct abstract_syntax_tree*  p_ast;
   int                           i_val;
   char*                         s_val;
+  double                        d_val;
 }
 
 %type <p_ast>
@@ -85,6 +87,7 @@ statement: RETURN expression SEMICOLON { $$ = ast_alloc(RETURN); ast_append_chil
 
 expression: IDENTIFIER { $$ = ast_alloc(IDENTIFIER); $$->s_val = $1; }
  | INTEGER_CONSTANT { $$ = ast_alloc(INTEGER_CONSTANT); $$->i_val = $1; }
+ | DOUBLE_CONSTANT { $$ = ast_alloc(DOUBLE_CONSTANT); $$->d_val = $1; }
  | expression PLUS expression {
     $$ = ast_alloc(PLUS);
     ast_append_child($$,$1);
