@@ -93,16 +93,47 @@ expression: IDENTIFIER { $$ = ast_alloc(IDENTIFIER); $$->s_val = $1; }
  ;
  
 %%
+
+symbol_table* build_symbol_table(abstract_syntax_tree* ast, symbol_table* st)
+{
+  ast_nodelist* cur_child = 0;
+  switch(ast->token_type)
+  {
+  case IDENTIFIER:
+    st_add_symbol(st, ast->s_val);
+    break;
+  case ARGS_LIST:
+  case STATEMENTS:
+    cur_child = ast->children;
+    while(cur_child)
+    {
+      build_symbol_table(cur_child->node, st);
+      cur_child = cur_child->next;
+    }
+    break;
+  case FUNCTION:
+    //function name in current scope
+    build_symbol_table(ast_nth_child(ast, 1), st);
+    //enter function scope
+    st_enter_scope(st);
+    //handle args list
+    build_symbol_table(ast_nth_child(ast, 2), st);
+    //handle body
+    build_symbol_table(ast_nth_child(ast, 3), st);
+    st_print(st);
+    //exit function scope
+    st_exit_scope(st);
+    break;
+  }  
+}
+
 int main(int argc, char** argv)
 {
   yyparse();
   ast_print(root);
   symbol_table* st = st_alloc();
-  //root is always a function
-  abstract_syntax_tree* ident = ast_nth_child(root, 2);
-  st->append_symbol(st, ident->s_val);
-  st_enter_scope(st);
-
+  build_symbol_table(root, st);
+  st_print(st);
 }
 
 int yyerror(char *s)

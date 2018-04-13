@@ -89,7 +89,7 @@ abstract_syntax_tree* ast_nth_child(abstract_syntax_tree* ast, size_t n)
       ++i;
     }
   }
-  return list;
+  return list->node;
 }
 
 void ast_free(abstract_syntax_tree* ast)

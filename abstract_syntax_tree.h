@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "c_language.tab.h"
 
 typedef struct abstract_syntax_tree abstract_syntax_tree;
