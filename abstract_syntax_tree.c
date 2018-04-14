@@ -32,6 +32,10 @@ const char* token_to_string(int token_type)
     return "PLUS";
   case INTEGER_CONSTANT:
     return "INTEGER_CONSTANT";
+  case STRING_CONSTANT:
+    return "STRING_CONSTANT";
+  case CHARACTER_CONSTANT:
+    return "CHARACTER_CONSTANT";
   case IDENTIFIER:
     return "IDENTIFIER";
   case FUNCTION:
@@ -40,6 +44,10 @@ const char* token_to_string(int token_type)
     return "ARGS_LIST";
   case STATEMENTS:
     return "STATEMENTS";
+  case DECLARATION:
+    return "DECLARATION";
+  case COMPILATION_UNIT:
+    return "COMPILATION_UNIT";
   default:
     return "unknown token";
   }
@@ -54,6 +62,27 @@ abstract_syntax_tree* ast_alloc
   ast->token_type           = token_type;
   ast->children             = 0;
   ast->s_val                = 0;
+  return ast;
+}
+
+abstract_syntax_tree* ast_alloc_i(int token_type, int i_val)
+{
+  abstract_syntax_tree* ast = ast_alloc(token_type);
+  ast->i_val = i_val;
+  return ast;
+}
+
+abstract_syntax_tree* ast_alloc_c(int token_type, char c_val)
+{
+  abstract_syntax_tree*  ast = ast_alloc(token_type);
+  ast->c_val = c_val;
+  return ast;
+}
+
+abstract_syntax_tree* ast_alloc_s(int token_type, char* s_val)
+{
+  abstract_syntax_tree* ast = ast_alloc(token_type);
+  ast->s_val = s_val;
   return ast;
 }
 
@@ -89,7 +118,7 @@ abstract_syntax_tree* ast_nth_child(abstract_syntax_tree* ast, size_t n)
       ++i;
     }
   }
-  return list;
+  return list->node;
 }
 
 void ast_free(abstract_syntax_tree* ast)
@@ -119,8 +148,13 @@ char* _extra_stuff(abstract_syntax_tree* ast)
     sprintf(ret, "(%d)", ast->i_val);
     break;
   case IDENTIFIER:
-    ret = (char*) malloc(strlen(ast->s_val) + 3);
-    sprintf(ret, "(%s)", ast->s_val);
+  case STRING_CONSTANT:
+    ret = (char*) malloc(strlen(ast->s_val) + 5);
+    sprintf(ret, "(\"%s\")", ast->s_val);
+    break;
+  case CHARACTER_CONSTANT:
+    ret = (char*) malloc(5);
+    sprintf(ret, "('%c')", ast->c_val);
     break;
   default:
     ret = (char*) calloc(1, 0);
@@ -137,6 +171,8 @@ void _ast_print(abstract_syntax_tree* ast, int indent)
   }
   const char* tok_str = token_to_string(ast->token_type);
   char* extra_stuff   = _extra_stuff(ast);
+  // fprintf(stdout, "%s", padding);
+  // yy_symbol_print(stdout, )
   printf("%s%s%s\n", padding, tok_str, extra_stuff);
   free(padding);
   free(extra_stuff);

@@ -1,5 +1,7 @@
 #include "c_language.tab.h"
 
+#include <string.h>
+
 typedef struct abstract_syntax_tree abstract_syntax_tree;
 typedef struct ast_nodelist         ast_nodelist;
 struct ast_nodelist
@@ -11,13 +13,17 @@ struct ast_nodelist
 struct abstract_syntax_tree
 {
   int           token_type;
+  char          c_val;
   char*         s_val;
   int           i_val;
   ast_nodelist* children;
 };
 
-
 abstract_syntax_tree* ast_alloc(int token_type);
+
+abstract_syntax_tree* ast_alloc_i(int token_type, int i_val);
+abstract_syntax_tree* ast_alloc_c(int token_type, char c_val);
+abstract_syntax_tree* ast_alloc_s(int token_type, char* s_val);
 
 void ast_append_child(abstract_syntax_tree* ast, abstract_syntax_tree* child);
 
