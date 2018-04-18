@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "c_language.tab.h"
 
 #include <string.h>

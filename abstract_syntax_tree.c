@@ -24,8 +24,14 @@ const char* token_to_string(int token_type)
     return "CLOSE_BRACE";
   case COMMA:
     return "COMMA";
+  case EQUALS:
+    return "EQUALS";
   case RETURN:
     return "RETURN";
+  case IF:
+    return "IF";
+  case ELSE:
+    return "ELSE";
   case SEMICOLON:
     return "SEMICOLON";
   case PLUS:
@@ -38,8 +44,10 @@ const char* token_to_string(int token_type)
     return "CHARACTER_CONSTANT";
   case IDENTIFIER:
     return "IDENTIFIER";
-  case FUNCTION:
-    return "FUNCTION";
+  case FUNCTION_DEFINITION:
+    return "FUNCTION_DEFINITION";
+  case FUNCTION_DECLARATION:
+    return "FUNCTION_DECLARATION";
   case ARGS_LIST:
     return "ARGS_LIST";
   case STATEMENTS:
@@ -118,7 +126,14 @@ abstract_syntax_tree* ast_nth_child(abstract_syntax_tree* ast, size_t n)
       ++i;
     }
   }
-  return list->node;
+  if (list)
+  {
+    return list->node;
+  }
+  else
+  {
+    return 0;
+  }
 }
 
 void ast_free(abstract_syntax_tree* ast)
